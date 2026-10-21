@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Рынок ИКТ Кыргызстана — информационная система</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js подключается с CDN (нужен интернет только для графиков) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== Боковое меню ===== -->
+  <aside class="sidebar" id="sidebar" aria-label="Главное меню">
+    <div class="brand">
+      <span class="brand__logo">ИКТ</span>
+      <div>
+        <strong>Рынок ИКТ</strong>
+        <small>Кыргызстан</small>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <a href="#dashboard" data-section="dashboard"><span>📊</span> Главная панель</a>
+      <a href="#companies" data-section="companies"><span>🏢</span> Каталог компаний</a>
+      <a href="#products" data-section="products"><span>💻</span> Услуги и продукты</a>
+      <a href="#tables" data-section="tables"><span>📋</span> Сводные таблицы</a>
+      <a href="#charts" data-section="charts"><span>📈</span> Аналитика рынка</a>
+      <a href="#statistics" data-section="statistics"><span>📅</span> Статистика и динамика</a>
+      <a href="#register" data-section="register"><span>📝</span> Регистрация компании</a>
+      <a href="#data" data-section="data"><span>💾</span> Данные и экспорт</a>
+    </nav>
+    <div class="sidebar__foot">
+      <span class="tag tag--demo">ДЕМО</span>
+      <p>Тестовые данные не являются официальной статистикой.</p>
+    </div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ===== Основная часть ===== -->
+  <div class="main">
+    <header class="topbar">
+      <button class="burger" id="burger" aria-label="Открыть меню">☰</button>
+      <h1 id="pageTitle">Главная панель</h1>
+      <div class="topbar__right">
+        <button class="btn btn--primary btn--sm" data-action="add" data-entity="companies">+ Компания</button>
+      </div>
+    </header>
+
+    <div class="demo-banner" role="note">
+      ⚠ <strong>Демонстрационные данные.</strong> Названия компаний, показатели и цены в системе вымышлены и не подтверждены
+      официальной статистикой (Нацстатком КР, Минцифры КР и др.). Записи, добавленные вами, хранятся только в этом браузере.
+    </div>
+
+    <main class="content">
+
+      <!-- ===== Главная панель ===== -->
+      <section id="dashboard" class="view">
+        <div class="kpi-grid" id="kpiGrid"></div>
+        <div class="grid-2">
+          <div class="card">
+            <h2>Компании по направлениям</h2>
+            <div class="chart-box"><canvas id="ch_dash_cat"></canvas></div>
+          </div>
+          <div class="card">
+            <h2>Объём рынка ИКТ, млрд сом <span class="tag tag--demo">демо</span></h2>
+            <div class="chart-box"><canvas id="ch_dash_market"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Топ-5 компаний по выручке</h2>
+          <div class="table-wrap"><table id="topTable"></table></div>
+        </div>
+      </section>
+
+      <!-- ===== Каталог компаний ===== -->
+      <section id="companies" class="view">
+        <div class="card">
+          <div class="toolbar">
+            <input type="search" id="companySearch" placeholder="🔍 Поиск по названию, услугам, городу…">
+            <select id="companyCategory" aria-label="Направление"></select>
+            <select id="companyCity" aria-label="Город"></select>
+            <select id="companyStatus" aria-label="Статус"></select>
+            <select id="companySort" aria-label="Сортировка">
+              <option value="name">По названию</option>
+              <option value="revenue">По выручке ↓</option>
+              <option value="employees">По сотрудникам ↓</option>
+              <option value="founded">По году основания ↓</option>
+            </select>
+          </div>
+          <div class="toolbar toolbar--actions">
+            <span class="muted" id="companyCount"></span>
+            <span class="spacer"></span>
+            <button class="btn btn--ghost btn--sm" data-action="reset-filters" data-entity="companies">Сбросить фильтры</button>
+            <button class="btn btn--ghost btn--sm" data-action="export" data-entity="companies">⬇ Экспорт CSV</button>
+            <button class="btn btn--primary btn--sm" data-action="add" data-entity="companies">+ Добавить компанию</button>
+          </div>
+          <div class="table-wrap"><table id="companiesTable"></table></div>
+        </div>
+      </section>
+
+      <!-- ===== Услуги и продукты ===== -->
+      <section id="products" class="view">
+        <div class="kpi-grid kpi-grid--3" id="productTypeCards"></div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="search" id="productSearch" placeholder="🔍 Поиск по названию, компании, описанию…">
+            <select id="productType" aria-label="Тип"></select>
+            <select id="productSort" aria-label="Сортировка">
+              <option value="name">По названию</option>
+              <option value="price-asc">Цена ↑</option>
+              <option value="price-desc">Цена ↓</option>
+            </select>
+          </div>
+          <div class="toolbar toolbar--actions">
+            <span class="muted" id="productCount"></span>
+            <span class="spacer"></span>
+            <button class="btn btn--ghost btn--sm" data-action="reset-filters" data-entity="products">Сбросить фильтры</button>
+            <button class="btn btn--ghost btn--sm" data-action="export" data-entity="products">⬇ Экспорт CSV</button>
+            <button class="btn btn--primary btn--sm" data-action="add" data-entity="products">+ Добавить услугу / продукт</button>
+          </div>
+          <div class="table-wrap"><table id="productsTable"></table></div>
+        </div>
+      </section>
+
+      <!-- ===== Сводные таблицы ===== -->
+      <section id="tables" class="view">
+        <div class="card">
+          <div class="toolbar toolbar--actions">
+            <h2>Направления деятельности</h2>
+            <span class="spacer"></span>
+            <button class="btn btn--ghost btn--sm" data-action="export-summary" data-entity="directions">⬇ Экспорт CSV</button>
+          </div>
+          <div class="table-wrap"><table id="directionsTable"></table></div>
+        </div>
+        <div class="card">
+          <div class="toolbar toolbar--actions">
+            <h2>Цены по типам услуг и продуктов</h2>
+            <span class="spacer"></span>
+            <button class="btn btn--ghost btn--sm" data-action="export-summary" data-entity="prices">⬇ Экспорт CSV</button>
+          </div>
+          <div class="table-wrap"><table id="pricesTable"></table></div>
+        </div>
+        <div class="card">
+          <div class="toolbar toolbar--actions">
+            <h2>Города присутствия компаний</h2>
+            <span class="spacer"></span>
+            <button class="btn btn--ghost btn--sm" data-action="export-summary" data-entity="cities">⬇ Экспорт CSV</button>
+          </div>
+          <div class="table-wrap"><table id="citiesTable"></table></div>
+        </div>
+      </section>
+
+      <!-- ===== Аналитика ===== -->
+      <section id="charts" class="view">
+        <div class="grid-2">
+          <div class="card"><h2>Выручка по направлениям, млн сом</h2><div class="chart-box"><canvas id="ch_cat_rev"></canvas></div></div>
+          <div class="card"><h2>Компании по городам</h2><div class="chart-box"><canvas id="ch_city"></canvas></div></div>
+          <div class="card"><h2>Крупнейшие работодатели (сотрудники)</h2><div class="chart-box"><canvas id="ch_emp"></canvas></div></div>
+          <div class="card"><h2>Средняя цена по типам, сом</h2><div class="chart-box"><canvas id="ch_price"></canvas></div></div>
+          <div class="card"><h2>Рост числа компаний по году основания</h2><div class="chart-box"><canvas id="ch_founded"></canvas></div></div>
+          <div class="card"><h2>Сотрудники и выручка компаний</h2><div class="chart-box"><canvas id="ch_scatter"></canvas></div></div>
+        </div>
+      </section>
+
+      <!-- ===== Статистика ===== -->
+      <section id="statistics" class="view">
+        <div class="kpi-grid" id="statKpis"></div>
+        <div class="grid-2">
+          <div class="card"><h2>Объём рынка и доля в ВВП <span class="tag tag--demo">демо</span></h2><div class="chart-box"><canvas id="ch_st_market"></canvas></div></div>
+          <div class="card"><h2>Экспорт ИКТ-услуг и занятость <span class="tag tag--demo">демо</span></h2><div class="chart-box"><canvas id="ch_st_export"></canvas></div></div>
+          <div class="card"><h2>Пользователи интернета, % <span class="tag tag--demo">демо</span></h2><div class="chart-box"><canvas id="ch_st_internet"></canvas></div></div>
+          <div class="card"><h2>Годовой прирост объёма рынка, % <span class="tag tag--demo">демо</span></h2><div class="chart-box"><canvas id="ch_st_growth"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="toolbar toolbar--actions">
+            <h2>Показатели по годам</h2>
+            <span class="spacer"></span>
+            <button class="btn btn--ghost btn--sm" data-action="export" data-entity="stats">⬇ Экспорт CSV</button>
+            <button class="btn btn--primary btn--sm" data-action="add" data-entity="stats">+ Добавить год</button>
+          </div>
+          <div class="table-wrap"><table id="statsTable"></table></div>
+        </div>
+      </section>
+
+      <!-- ===== Регистрация ===== -->
+      <section id="register" class="view">
+        <div class="card card--narrow">
+          <h2>Регистрация IT-компании</h2>
+          <p class="muted">Заполните форму — компания появится в каталоге со статусом «На модерации». Поля со знаком * обязательны.</p>
+          <form id="regForm" novalidate>
+            <div class="form-grid" id="regFields"></div>
+            <label class="check">
+              <input type="checkbox" id="regAgree">
+              <span>Подтверждаю достоверность указанных данных *</span>
+            </label>
+            <small class="error" id="regAgreeErr"></small>
+            <div class="form-actions">
+              <button type="reset" class="btn btn--ghost">Очистить</button>
+              <button type="submit" class="btn btn--primary">Зарегистрировать компанию</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ===== Данные ===== -->
+      <section id="data" class="view">
+        <div class="card">
+          <h2>Экспорт данных в CSV</h2>
+          <p class="muted">Файлы сохраняются в кодировке UTF-8 с разделителем «;» и открываются в Excel.</p>
+          <div class="btn-row">
+            <button class="btn btn--ghost" data-action="export-all" data-entity="companies">⬇ Компании</button>
+            <button class="btn btn--ghost" data-action="export-all" data-entity="products">⬇ Услуги и продукты</button>
+            <button class="btn btn--ghost" data-action="export-all" data-entity="stats">⬇ Статистика</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Хранение данных</h2>
+          <p class="muted">Все данные хранятся в localStorage вашего браузера. Сервер и база данных не используются.</p>
+          <div class="info-list" id="storageInfo"></div>
+          <div class="btn-row">
+            <button class="btn btn--ghost" data-action="reset-demo">↺ Восстановить демо-данные</button>
+            <button class="btn btn--danger" data-action="clear-all">🗑 Удалить все данные</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>О демонстрационных данных</h2>
+          <p>Все компании, цены и показатели, загруженные при первом запуске, — <strong>вымышленные</strong> и помечены значком
+            <span class="tag tag--demo">демо</span>. Они нужны для показа возможностей системы. Для аналитики используйте
+            официальные источники: Национальный статистический комитет КР, Министерство цифрового развития КР, Парк высоких технологий.</p>
+        </div>
+      </section>
+
+    </main>
+    <footer class="footer">© «Рынок ИКТ Кыргызстана» — учебная информационная система. Данные демонстрационные.</footer>
+  </div>
+</div>
+
+<!-- Окно добавления / редактирования -->
+<dialog id="modal">
+  <form id="modalForm" novalidate>
+    <div class="modal__head">
+      <h3 id="modalTitle"></h3>
+      <button type="button" class="icon-btn" id="modalClose" aria-label="Закрыть">✕</button>
+    </div>
+    <div class="form-grid" id="modalFields"></div>
+    <div class="form-actions">
+      <button type="button" class="btn btn--ghost" id="modalCancel">Отмена</button>
+      <button type="submit" class="btn btn--primary">Сохранить</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+</body>
+</html>
